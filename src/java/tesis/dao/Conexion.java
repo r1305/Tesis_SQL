@@ -15,7 +15,11 @@ import java.sql.SQLException;
  */
 public class Conexion {
     String url = "jdbc:mysql://us-cdbr-iron-east-04.cleardb.net:3306/heroku_74736d96aaaaaed?user=bf5984dcefc6a5&password=77b6157c";
-    String url2="jdbc:mysql://localhost:3306/tesis?user=root&password=root";
+    //url de conexion a la máquina de servidor dedicado
+    //usuario: tesis_bd tiene todos los permisos necesarios para acceder desde otro host
+    //192.168.118.130: host de la máquina servidor de mysql
+    
+    String url2="jdbc:mysql://192.168.118.130:3306/tesis_aburto?user=tesis_bd&password=tesis_bd";
 
     public Connection getConexion() {
         java.sql.Connection con = null;

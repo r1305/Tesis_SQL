@@ -23,9 +23,9 @@ public class NewMain {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Correlacion c=new Correlacion();
+        //Correlacion c=new Correlacion();
         //System.out.println(c.correlacion(3,4));
-        c.correlacion(3, 4);
+        //c.correlacion(3, 4);
         
         /*String o=uxa.getActividades();
         JSONParser p=new JSONParser();
@@ -42,8 +42,8 @@ public class NewMain {
         Prediccion pre=new Prediccion();
         pre.getActividadRecomendada(4);
         
-        UsuarioxActividad uxa=new UsuarioxActividad();
-        System.out.println(uxa.getNombreApellido("rogger.aburto@gmail.com"));
+        /*UsuarioxActividad uxa=new UsuarioxActividad();
+        System.out.println(uxa.getNombreApellido("rogger.aburto@gmail.com"));*/
         
         
         
