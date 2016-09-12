@@ -20,6 +20,7 @@ public class Conexion {
     //192.168.118.130: host de la máquina servidor de mysql
     
     String url2="jdbc:mysql://192.168.118.130:3306/tesis_aburto?user=tesis_bd&password=tesis_bd";
+    
 
     public Connection getConexion() {
         java.sql.Connection con = null;

@@ -35,7 +35,7 @@ public class Prediccion {
         PreparedStatement pr;
         try {
             cn = c.getConexion();
-            String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion;
+            String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=getdate()";
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
 
