@@ -1,12 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <servlet>
-        <servlet-name>Prediccion</servlet-name>
-        <servlet-class>tesis.servlets.Prediccion</servlet-class>
+        <servlet-name>Usuario</servlet-name>
+        <servlet-class>tesis.servlets.Usuario</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Recomendacion</servlet-name>
+        <servlet-class>tesis.servlets.Recomendacion</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TesisService</servlet-name>
+        <servlet-class>tesis.servlets.TesisService</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Update</servlet-name>
+        <servlet-class>tesis.servlets.Update</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Login</servlet-name>
+        <servlet-class>tesis.servlets.Login</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SignUp</servlet-name>
+        <servlet-class>tesis.servlets.SignUp</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Validar</servlet-name>
+        <servlet-class>tesis.servlets.Validar</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UploadImage</servlet-name>
+        <servlet-class>tesis.servlets.UploadImage</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Puntuar</servlet-name>
+        <servlet-class>tesis.servlets.Puntuar</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>GetActivities</servlet-name>
+        <servlet-class>tesis.servlets.GetActivities</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SearchActivity</servlet-name>
+        <servlet-class>tesis.servlets.SearchActivity</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Prediccion</servlet-name>
-        <url-pattern>/prediccion</url-pattern>
+        <servlet-name>Usuario</servlet-name>
+        <url-pattern>/Usuario</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Recomendacion</servlet-name>
+        <url-pattern>/recomendacion</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TesisService</servlet-name>
+        <url-pattern>/tesis</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Update</servlet-name>
+        <url-pattern>/update</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Login</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SignUp</servlet-name>
+        <url-pattern>/signup</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Validar</servlet-name>
+        <url-pattern>/validar</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UploadImage</servlet-name>
+        <url-pattern>/upload</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Puntuar</servlet-name>
+        <url-pattern>/puntuar</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GetActivities</servlet-name>
+        <url-pattern>/getActivities</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchActivity</servlet-name>
+        <url-pattern>/searchActivity</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -7,8 +7,10 @@ package tesis.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
 
 /**
@@ -20,7 +22,7 @@ public class Usuarios {
     Conexion c = new Conexion();
 
     public boolean updateFoto(int id, String url) {
-        
+
         boolean ok = false;
         try {
 
@@ -48,7 +50,7 @@ public class Usuarios {
 
             Connection conn = c.getConexion();
 
-            String query = "update usuarios set nombre='" + nombre + "', edad="+edad+",url='"+url+"' where correo=" + id;
+            String query = "update usuarios set nombre='" + nombre + "', edad=" + edad + ",url='" + url + "' where correo=" + id;
 
             PreparedStatement ps = conn.prepareStatement(query);
 
@@ -80,7 +82,7 @@ public class Usuarios {
                     + ",'" + edad + "'"
                     + "," + url + ""
                     + ",'" + correo + "'"
-                    + ",'"+clave+"')";
+                    + ",'" + clave + "')";
 
             PreparedStatement ps = conn.prepareStatement(query);
             ps.executeUpdate();
@@ -94,54 +96,76 @@ public class Usuarios {
         return ok;
     }
 
-    /*public boolean validarUsuario(String correo) {
+    public boolean validarUsuario(String correo) {
         boolean ok = false;
-        MongoCollection<Document> col = c.getConnection("usuarios");
-        //devuelve el usuario que tenga el mismo correo, si existe
+        String co = "";
         try {
-            Document doc = col.find(eq("correo", correo)).first();
-            String c = doc.getString("correo");
+            Connection con = c.getConexion();
+            String strsql = "SELECT * FROM usuarios where correo='" + correo + "'";
+            PreparedStatement pstm = con.prepareStatement(strsql);
 
-            if (c != "") {
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                co = rs.getString("correo");
+            }
+            if (co != "" || co != null) {
                 ok = true;
             }
+
+            pstm.close();
+            con.close();
+
         } catch (Exception e) {
             ok = false;
+            System.out.println(e);
         }
         return ok;
     }
 
     public String login(String u, String p) {
-        String id;
-        MongoCollection<Document> col = c.getConnection("usuarios");
+        String id="";
         try {
-            Document doc = col.find(eq("correo", u)).first();
-            if (u.equals(doc.getString("correo")) && p.equals(doc.getString("clave"))) {
-                id = doc.getString("correo");
-            } else {
-                id = "error";
+            Connection con = c.getConexion();
+            String strsql = "SELECT * FROM usuarios where correo='" + u + "' and clave='"+p+"'";
+            PreparedStatement pstm = con.prepareStatement(strsql);
+
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                id = rs.getString("correo");
             }
-        } catch (NullPointerException e) {
+
+            pstm.close();
+            con.close();
+
+        } catch (Exception e) {
             id = "error";
-        }
+            System.out.println(e);
+        }        
 
         return id;
     }
 
     public String getFbLogin(String correo) {
         String id = "";
+        try{
+            Connection con=c.getConexion();
+            String strsql = "SELECT * FROM usuarios where correo='"+correo+"'";
+            PreparedStatement pstm = con.prepareStatement(strsql);
 
-        MongoCollection<Document> col = c.getConnection("usuarios");
-        try {
-            Document doc = col.find(eq("correo", correo)).first();
-            if (correo.equals(doc.getString("correo"))) {
-                id = String.valueOf(doc.getInteger("_id"));
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                id=String.valueOf(rs.getString("id"));
             }
-        } catch (NullPointerException e) {
-            id = "fail";
-        }
+            pstm.close();
+            rs.close();
+            con.close();
+            
+        }catch(Exception e){
+            id="fail";
+            System.out.println(e);
+        }       
 
         return id;
-    }*/
+    }
 
 }

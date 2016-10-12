@@ -67,10 +67,10 @@ public class UsuarioxActividad {
             while (rs.next()) {
                 o.put("nombre", rs.getString("nombre"));
                 o.put("edad", rs.getInt("edad"));
-                o.put("foto", rs.getString("edad"));
+                o.put("foto", rs.getString("foto"));
                 o.put("correo", rs.getString("correo"));
-                
-                nombreA=o.toString();
+
+                nombreA = o.toString();
 
             }
             rs.close();
@@ -89,7 +89,7 @@ public class UsuarioxActividad {
         UsuarioxActividad usuAct;
         try {
 
-            String strsql = "SELECT * FROM usuarioxactividad where idUsuario="+idCliente;
+            String strsql = "SELECT * FROM usuarioxactividad where idUsuario=" + idCliente;
             PreparedStatement pstm = con.prepareStatement(strsql);
 
             ResultSet rs = pstm.executeQuery();
@@ -110,44 +110,61 @@ public class UsuarioxActividad {
         return uxr;
     }
 
-    /*public void insertar(String correo, int idAct, float puntuacion) {
-     Conexion c = new Conexion();
-     MongoCollection<Document> col = c.getConnection("usuarioxactividad");
-     int idUsuario = 0;
-     idUsuario = getId(correo);
-
-     if (!this.existe(idUsuario, idAct)) {
-     Document doc = new Document("_id", this.getCount() + 1);
-     doc.append("idUsuario", idUsuario);
-     doc.append("idAct", idAct);
-     doc.append("puntuacion", puntuacion);
-     doc.append("vez", 1);
-     col.insertOne(doc);
-     } else {
-     this.actualizarPuntuacion(idUsuario, idAct, puntuacion);
-     }
-    
-
-    
-
-     public boolean existe(int idUsuario, int idAct) {
-     Conexion c = new Conexion();
-     MongoCollection<Document> col = c.getConnection("usuarioxactividad");
-     long count = col.count(and(eq("idUsuario", idUsuario), eq("idAct", idAct)));
-     System.out.println(c);
-     System.out.println(idUsuario);
-     System.out.println(idAct);
-     if (count == 1) {
-     return true;
-     } else {
-     return false;
-     }
-     }*/
-    public void actualizarPuntuacion(int idUsuario, int idAct, float puntuacion) {
+    public boolean insertar(String correo, int idAct, float puntuacion) {
         Conexion c = new Conexion();
+        boolean ok=false;
+        try {
+            Connection con = c.getConexion();
+            String strsql = "insert into usuarioxactividad (puntuacion,vez,idUsuario,idAct) value(?,?,?,?)";
+            PreparedStatement pstm = con.prepareStatement(strsql);
+            int idUsuario = 0;
+            idUsuario = getId(correo);
+            if (!this.existe(idUsuario, idAct)) {
+                pstm.setFloat(1, puntuacion);
+                pstm.setInt(2, 1);
+                pstm.setInt(3, idUsuario);
+                pstm.setInt(4, idAct);
+                pstm.executeUpdate();
+                ok=true;
+            } else {
+                ok=this.actualizarPuntuacion(idUsuario, idAct, puntuacion);               
+            }
+        } catch (Exception e) {
+            ok=false;
+            System.out.println(e);
+        }
+        return ok;
+    }
+
+    public boolean existe(int idUsuario, int idAct) {
+        Conexion c = new Conexion();
+        int cont = 0;
+        try {
+            Connection con = c.getConexion();
+            String strsql = "SELECT * FROM usuarioxactividad where idUsuario="+idUsuario+" and idAct="+idAct;
+            PreparedStatement pstm = con.prepareStatement(strsql);
+
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                cont++;
+            }
+            if (cont == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    public boolean actualizarPuntuacion(int idUsuario, int idAct, float puntuacion) {
+        Conexion c = new Conexion();
+        boolean ok=false;
         double puntAnt = 0;
-        int vez=0;
-        int uxa=0;
+        int vez = 0;
+        int uxa = 0;
         try {
 
             try (Connection con = c.getConexion()) {
@@ -168,20 +185,23 @@ public class UsuarioxActividad {
                 String query = "update usuarioxactividad set puntuacion=" + nuevaPunt + ", vez=" + vez + " where id=" + uxa;
                 PreparedStatement ps = con.prepareStatement(query);
                 ps.executeUpdate();
+                
                 ps.close();
 
                 /*Query para actualizar puntaje de actividades*/
                 String query1 = "update actividades set puntuacion=" + nuevaPunt + " where id=" + idAct;
                 PreparedStatement ps1 = con.prepareStatement(query1);
                 ps1.executeUpdate();
+                ok=true;
                 ps1.close();
-
                 con.close();
             }
 
         } catch (Exception e) {
+            ok=false;
             System.out.println(e);
         }
+        return ok;
     }
 
     public double nuevaPuntuacion(double puntAnt, float puntuacion, int vez) {
@@ -216,26 +236,61 @@ public class UsuarioxActividad {
 
     public String getActividades() {
         Conexion c = new Conexion();
-        
-        JSONObject o = new JSONObject();
+
+        JSONObject ob = new JSONObject();
         JSONArray ja = new JSONArray();
         try {
-            Connection con=c.getConexion();
+            Connection con = c.getConexion();
             String strsql = "SELECT * FROM actividades";
             PreparedStatement pstm = con.prepareStatement(strsql);
 
             ResultSet rs = pstm.executeQuery();
             while (rs.next()) {
-                ja.add(rs.getString("nombre"));
-            }           
-            o.put("act", ja);
-            
+                JSONObject o = new JSONObject();
+                o.put("id", rs.getInt("id"));
+                o.put("nombre", rs.getString("nombre"));
+                o.put("fecha", rs.getString("fecha"));
+                o.put("capacidad", rs.getInt("capacidad"));
+                o.put("puntaje", rs.getFloat("puntuacion"));
+                ja.add(o);
+            }
+            ob.put("act", ja);
+
             pstm.close();
             con.close();
         } catch (Exception e) {
             System.out.println(e);
         }
-        return o.toString();
+        return ob.toString();
+    }
+
+    public String searchActividades(String search) {
+        Conexion c = new Conexion();
+        JSONObject ob = new JSONObject();
+        JSONArray ja = new JSONArray();
+        try {
+            Connection con = c.getConexion();
+            String strsql = "SELECT * FROM actividades where categoria like '%" + search + "%'";
+            PreparedStatement pstm = con.prepareStatement(strsql);
+
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                JSONObject o = new JSONObject();
+                o.put("id", rs.getInt("id"));
+                o.put("nombre", rs.getString("nombre"));
+                o.put("fecha", rs.getString("fecha"));
+                o.put("capacidad", rs.getInt("capacidad"));
+                o.put("puntaje", rs.getFloat("puntuacion"));
+                ja.add(o);
+            }
+            ob.put("act", ja);
+
+            pstm.close();
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return ob.toString();
     }
 
 }

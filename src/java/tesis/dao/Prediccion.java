@@ -5,12 +5,13 @@
  */
 package tesis.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import tesis.dto.UsuarioxActividad;
 
 /**
@@ -22,37 +23,45 @@ public class Prediccion {
     UsuarioxActividad uxa = new UsuarioxActividad();
     Correlacion c = new Correlacion();
 
-    public List<String> getActividadRecomendada(int idUsuario) {
+    public String getActividadRecomendada(int idUsuario) {
         Conexion c = new Conexion();
-        List<String> l=new ArrayList<>();
-        
+        List<String> l = new ArrayList<>();
+
         //obtener puntuacion promedio del usuario a para la actividad x
         float puntuacion = hallarPrediccion(idUsuario);
-        System.out.println("puntuacion: "+puntuacion);
-        
+        System.out.println("puntuacion: " + puntuacion);
+
         Connection cn;
         ResultSet rs;
         PreparedStatement pr;
+        JSONObject ob = new JSONObject();
+        JSONArray ja = new JSONArray();
         try {
             cn = c.getConexion();
-            String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=getdate()";
+            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
+            String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion;
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
 
             while (rs.next()) {
-                String nombre = rs.getString("nombre");
-                l.add(nombre);
-                System.out.println(nombre+" - "+rs.getFloat("puntuacion"));
-                
+                JSONObject o = new JSONObject();
+                o.put("id", rs.getInt("id"));
+                o.put("nombre", rs.getString("nombre"));
+                o.put("fecha", rs.getString("fecha"));
+                o.put("capacidad", rs.getInt("capacidad"));
+                o.put("puntaje", rs.getFloat("puntuacion"));
+                ja.add(o);
+
             }
+            ob.put("reco", ja);
             rs.close();
             pr.close();
             cn.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }
-                
-        return l;
+
+        return ob.toString();
 
     }
 
@@ -61,6 +70,7 @@ public class Prediccion {
 
         //Usuario para evaluar
         List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
+        List<UsuarioxActividad> uxr2 = c.traerTodos();
 
         //Promedio del usuario a evaluar
         float promA = this.promedio(uxr);
@@ -68,29 +78,40 @@ public class Prediccion {
         float desvEst = this.desvEst(uxr);
         //Lista de puntuaciones de un restaurante por usuario
 
-        prediccion = promA + desvEst * this.hallarNumerador(idUsuario, uxr)
-                / this.hallarDenominador(idUsuario, uxr);
+        prediccion = promA + desvEst * this.hallarNumerador(idUsuario, uxr2)
+                / this.hallarDenominador(idUsuario, uxr2);
 
         return prediccion;
     }
 
     private float hallarNumerador(int idUsuario, List<UsuarioxActividad> uxr) {
-        float num = 0.0f;
         float sum = 0.0f;
 
+        //aqui debo llamar a idUsuarios
+        UsuarioxActividad uxa = new UsuarioxActividad();
+        List<UsuarioxActividad> uxa1 = new ArrayList<>();
+
         for (int i = 0; i < uxr.size(); i++) {
-            sum += ((uxr.get(i).getPuntuacion()
-                    - this.promedio(uxa.obtenerPuntuacionesPorUsuario(uxr.get(i).getIdUsuario())))
-                    * c.correlacion(idUsuario, uxr.get(i).getIdUsuario()))
-                    / this.desvEst(uxa.obtenerPuntuacionesPorUsuario(uxr.get(i).getIdUsuario()));
+            uxa1.add(c.idUsuarios(idUsuario, uxr.get(i).getIdUsuario()));
+        }
+        for (int i = 0; i < uxa1.size(); i++) {
+            sum += ((uxa1.get(i).getPuntuacion() - this.promedio(uxa.obtenerPuntuacionesPorUsuario(uxa1.get(i).getIdUsuario())))
+                    / this.desvEst(uxa.obtenerPuntuacionesPorUsuario(uxr.get(i).getIdUsuario())))
+                    * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
         }
         return sum;
     }
 
     private float hallarDenominador(int idUsuario, List<UsuarioxActividad> uxr) {
         float den = 0.0f;
+        UsuarioxActividad uxa = new UsuarioxActividad();
+        List<UsuarioxActividad> uxa1 = new ArrayList<>();
+
         for (int i = 0; i < uxr.size(); i++) {
-            den += c.correlacion(idUsuario, uxr.get(i).getIdUsuario());
+            uxa1.add(c.idUsuarios(idUsuario, uxr.get(i).getIdUsuario()));
+        }
+        for (int i = 0; i < uxa1.size(); i++) {
+            den += c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
         }
         return den;
     }

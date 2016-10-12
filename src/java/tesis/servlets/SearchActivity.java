@@ -7,20 +7,17 @@ package tesis.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import tesis.dto.UsuarioxActividad;
 
 /**
  *
  * @author Julian
  */
-public class Prediccion extends HttpServlet {
+public class SearchActivity extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,26 +31,15 @@ public class Prediccion extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String correo=request.getParameter("id");
-        UsuarioxActividad u=new UsuarioxActividad();
-        int idUsuario=u.getId(correo);
-        
-        tesis.dao.Prediccion p=new tesis.dao.Prediccion();
-        List<String> l=p.getActividadRecomendada(idUsuario);
-        
-        //response.setContentType("text/html;charset=UTF-8");
-        JSONObject obj=new JSONObject();
-        JSONArray list=new JSONArray();
-        for(String a:l){
-            list.add(a);
-        }
-        obj.put("reco",list);
+        String search=request.getParameter("search");
+        UsuarioxActividad uxa=new UsuarioxActividad();
+        String rpta=uxa.searchActividades(search);
         
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        out.print(obj);
-        response.setContentType("text/html;charset=UTF-8");
-        
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.print(rpta);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

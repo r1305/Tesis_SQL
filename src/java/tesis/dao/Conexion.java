@@ -19,7 +19,7 @@ public class Conexion {
     //usuario: tesis_bd tiene todos los permisos necesarios para acceder desde otro host
     //192.168.118.130: host de la máquina servidor de mysql
     
-    String url2="jdbc:mysql://192.168.118.130:3306/tesis_aburto?user=tesis_bd&password=tesis_bd";
+    String url2="jdbc:mysql://localhost:3306/tesis?user=root&password=root";
     
 
     public Connection getConexion() {
