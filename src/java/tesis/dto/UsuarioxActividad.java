@@ -73,6 +73,7 @@ public class UsuarioxActividad {
                 nombreA = o.toString();
 
             }
+            pstm.close();
             rs.close();
             con.close();
         } catch (SQLException e) {
@@ -101,6 +102,7 @@ public class UsuarioxActividad {
 
                 uxr.add(usuAct);
             }
+            pstm.close();
             rs.close();
             con.close();
         } catch (SQLException e) {
@@ -129,6 +131,9 @@ public class UsuarioxActividad {
             } else {
                 ok=this.actualizarPuntuacion(idUsuario, idAct, puntuacion);               
             }
+            
+            con.close();
+            pstm.close();
         } catch (Exception e) {
             ok=false;
             System.out.println(e);
@@ -148,6 +153,9 @@ public class UsuarioxActividad {
             while (rs.next()) {
                 cont++;
             }
+            con.close();
+            rs.close();
+            pstm.close();
             if (cont == 1) {
                 return true;
             } else {
@@ -284,7 +292,7 @@ public class UsuarioxActividad {
                 ja.add(o);
             }
             ob.put("act", ja);
-
+            rs.close();
             pstm.close();
             con.close();
         } catch (Exception e) {

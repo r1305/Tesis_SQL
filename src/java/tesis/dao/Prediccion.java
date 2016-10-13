@@ -39,7 +39,12 @@ public class Prediccion {
         try {
             cn = c.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
-            String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion;
+            String sql="";
+            if (String.valueOf(puntuacion) == "NaN") {
+                sql = "SELECT * FROM actividades order by puntuacion limit 3";
+            }else{
+                sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion;
+            }
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
 
@@ -86,7 +91,6 @@ public class Prediccion {
 
     private float hallarNumerador(int idUsuario, List<UsuarioxActividad> uxr) {
         float sum = 0.0f;
-
         //aqui debo llamar a idUsuarios
         UsuarioxActividad uxa = new UsuarioxActividad();
         List<UsuarioxActividad> uxa1 = new ArrayList<>();
@@ -96,7 +100,7 @@ public class Prediccion {
         }
         for (int i = 0; i < uxa1.size(); i++) {
             sum += ((uxa1.get(i).getPuntuacion() - this.promedio(uxa.obtenerPuntuacionesPorUsuario(uxa1.get(i).getIdUsuario())))
-                    / this.desvEst(uxa.obtenerPuntuacionesPorUsuario(uxr.get(i).getIdUsuario())))
+                    / this.desvEst(uxa.obtenerPuntuacionesPorUsuario(uxa1.get(i).getIdUsuario())))
                     * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
         }
         return sum;
@@ -134,8 +138,8 @@ public class Prediccion {
         int cont = 0;
         for (int i = 0; i < punts.size(); i++) {
 
-            acum += (punts.get(i).getPuntuacion())
-                    * (punts.get(i).getPuntuacion());
+            acum += (punts.get(i).getPuntuacion()-promedio(punts))
+                    * (punts.get(i).getPuntuacion()-promedio(punts));
             cont++;
         }
         //cont-1 pasa a ser cont y se inicializa en 1, antes en 0

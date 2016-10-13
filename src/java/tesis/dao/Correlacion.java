@@ -35,31 +35,31 @@ public class Correlacion {
 
         return correlacion;
     }
-    
-    public List<UsuarioxActividad> traerTodos(){
-        List<UsuarioxActividad> l=new ArrayList<>();
+
+    public List<UsuarioxActividad> traerTodos() {
+        List<UsuarioxActividad> l = new ArrayList<>();
         UsuarioxActividad uxa;
         Conexion c = new Conexion();
-            try {
-                Connection con = c.getConexion();
-                String strsql = "SELECT * FROM usuarioxactividad";
-                PreparedStatement pstm = con.prepareStatement(strsql);
+        try {
+            Connection con = c.getConexion();
+            String strsql = "SELECT * FROM usuarioxactividad";
+            PreparedStatement pstm = con.prepareStatement(strsql);
 
-                ResultSet rs = pstm.executeQuery();
-                while (rs.next()) {
-                    uxa = new UsuarioxActividad();
-                    uxa.setIdUsuario(rs.getInt("idUsuario"));
-                    uxa.setPuntuacion(rs.getFloat("puntuacion"));
-                    uxa.setIdActividad(rs.getInt("idAct"));
-                    l.add(uxa);
-                }
-                rs.close();
-                con.close();
-
-            } catch (Exception e) {
-                System.out.println(e);
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                uxa = new UsuarioxActividad();
+                uxa.setIdUsuario(rs.getInt("idUsuario"));
+                uxa.setPuntuacion(rs.getFloat("puntuacion"));
+                uxa.setIdActividad(rs.getInt("idAct"));
+                l.add(uxa);
             }
-        
+            rs.close();
+            con.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
         return l;
     }
 
@@ -67,12 +67,12 @@ public class Correlacion {
             List<UsuarioxActividad> lista2) {
         float deno = 0.0f;
 
-        deno = (float) Math.pow(this.sumCuadrado( co,lista1, lista2)
-                * this.sumCuadrado(co,lista1, lista2), 0.5);
+        deno = (float) Math.pow(this.sumCuadrado(co, lista1, lista2)
+                * this.sumCuadrado(co, lista1, lista2), 0.5);
         return deno;
     }
 
-    private float sumCuadrado(List<Integer> co, List<UsuarioxActividad> lista,List<UsuarioxActividad> lista2) {
+    private float sumCuadrado(List<Integer> co, List<UsuarioxActividad> lista, List<UsuarioxActividad> lista2) {
         float sum = 0.0f;
         for (int i = 0; i < co.size(); i++) {
             sum += (this.buscarPunt(co.get(i), lista) - promedioLista(lista))
@@ -86,7 +86,7 @@ public class Correlacion {
         float num = 0.0f;
         //float prom=buscarPunt(idRest, lista2);
         for (int i = 0; i < co.size(); i++) {
-            num += (buscarPunt(co.get(i), lista1) - promedioLista(lista2))
+            num += (buscarPunt(co.get(i), lista1) - promedioLista(lista1))
                     * (buscarPunt(co.get(i), lista2) - promedioLista(lista2));
         }
         return num;
@@ -136,12 +136,11 @@ public class Correlacion {
             } catch (Exception e) {
                 System.out.println(e);
             }
-        }        
+        }
         return uxa3;
     }
 
-    public List<Integer> coincidencia(List<UsuarioxActividad> lista1,
-            List<UsuarioxActividad> lista2) {
+    public List<Integer> coincidencia(List<UsuarioxActividad> lista1, List<UsuarioxActividad> lista2) {
         List<Integer> co = new ArrayList<>();
 
         for (int i = 0; i < lista1.size(); i++) {
@@ -155,26 +154,21 @@ public class Correlacion {
     public boolean buscar(int idAct, List<UsuarioxActividad> lista2) {
         boolean enc = false;
         int i = 0;
-        for(i=0;i<lista2.size();i++){
+        for (i = 0; i < lista2.size(); i++) {
             if (lista2.get(i).getIdActividad() == idAct) {
-                enc=true;
+                enc = true;
             }
         }
-        
-
         return enc;
     }
 
     public double buscarPunt(int idRest, List<UsuarioxActividad> lista) {
         double punt = 0.0f;
-
         for (int i = 0; i < lista.size(); i++) {
-
             if (idRest == lista.get(i).getIdActividad()) {
                 punt = (float) lista.get(i).getPuntuacion();
             }
         }
         return punt;
     }
-
 }
