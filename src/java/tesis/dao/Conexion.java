@@ -19,7 +19,8 @@ public class Conexion {
     //usuario: tesis_bd tiene todos los permisos necesarios para acceder desde otro host
     //192.168.118.130: host de la máquina servidor de mysql
     
-    String url2="jdbc:mysql://localhost:3306/tesis?user=root&password=root";
+    String url2="jdbc:mysql://54.227.36.192:3306/tesis?user=root&password=root";
+    String url3="jdbc:mysql://localhost:3306/tesis?user=root&password=root";
     
 
     public Connection getConexion() {
@@ -28,7 +29,7 @@ public class Conexion {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             try {
-                con = DriverManager.getConnection(url2);
+                con = DriverManager.getConnection(url3);
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
