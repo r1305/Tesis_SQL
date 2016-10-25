@@ -10,7 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.w3c.dom.Document;
 
 /**
@@ -123,49 +126,75 @@ public class Usuarios {
     }
 
     public String login(String u, String p) {
-        String id="";
+        String id = "";
         try {
             Connection con = c.getConexion();
-            String strsql = "SELECT * FROM usuarios where correo='" + u + "' and clave='"+p+"'";
+            String strsql = "SELECT * FROM usuarios where correo='" + u + "' and clave='" + p + "'";
             PreparedStatement pstm = con.prepareStatement(strsql);
 
             ResultSet rs = pstm.executeQuery();
             while (rs.next()) {
                 id = rs.getString("correo");
             }
-
+            rs.close();
             pstm.close();
             con.close();
 
         } catch (Exception e) {
             id = "error";
             System.out.println(e);
-        }        
+        }
 
         return id;
     }
 
     public String getFbLogin(String correo) {
         String id = "";
-        try{
-            Connection con=c.getConexion();
-            String strsql = "SELECT * FROM usuarios where correo='"+correo+"'";
+        try {
+            Connection con = c.getConexion();
+            String strsql = "SELECT * FROM usuarios where correo='" + correo + "'";
             PreparedStatement pstm = con.prepareStatement(strsql);
 
             ResultSet rs = pstm.executeQuery();
             while (rs.next()) {
-                id=String.valueOf(rs.getString("id"));
+                id = String.valueOf(rs.getString("id"));
             }
             pstm.close();
             rs.close();
             con.close();
-            
-        }catch(Exception e){
-            id="fail";
+
+        } catch (Exception e) {
+            id = "fail";
             System.out.println(e);
-        }       
+        }
 
         return id;
+    }
+
+    public void gustos(String gustos, String correo) {
+
+        try {
+            JSONParser p = new JSONParser();
+            JSONObject o = (JSONObject) p.parse(gustos);
+            JSONArray a = (JSONArray) o.get("gustos");
+            for (int i = 0; i < a.size(); i++) {
+                System.out.println(a.get(i));
+                Connection conn = c.getConexion();
+                String query = "INSERT INTO usuarioxcategoria"
+                        + "(idUsuario"
+                        + ",categoria)"                       
+                        + "     VALUES"
+                        + "('" + correo + "'"
+                        + ",'" + a.get(i) + "')";
+
+                PreparedStatement ps = conn.prepareStatement(query);
+                ps.executeUpdate();
+                ps.close();
+                conn.close();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(Usuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

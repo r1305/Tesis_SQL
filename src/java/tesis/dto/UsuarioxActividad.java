@@ -99,6 +99,8 @@ public class UsuarioxActividad {
                 usuAct.setIdActividad(rs.getInt("idAct"));
                 usuAct.setIdUsuario(rs.getInt("idUsuario"));
                 usuAct.setPuntuacion(rs.getDouble("puntuacion"));
+                
+//                System.out.println("obtenerPunt: "+usuAct.getIdActividad()+" - "+usuAct.getIdUsuario()+" - "+usuAct.getPuntuacion());
 
                 uxr.add(usuAct);
             }

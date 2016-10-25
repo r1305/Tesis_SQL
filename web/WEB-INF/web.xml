@@ -44,6 +44,10 @@
         <servlet-name>SearchActivity</servlet-name>
         <servlet-class>tesis.servlets.SearchActivity</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Gustos</servlet-name>
+        <servlet-class>tesis.servlets.Gustos</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Usuario</servlet-name>
         <url-pattern>/Usuario</url-pattern>
@@ -87,6 +91,10 @@
     <servlet-mapping>
         <servlet-name>SearchActivity</servlet-name>
         <url-pattern>/searchActivity</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Gustos</servlet-name>
+        <url-pattern>/gustos</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
