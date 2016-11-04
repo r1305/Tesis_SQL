@@ -16,8 +16,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.w3c.dom.Document;
 
-/**
- *
+/*
  * @author Julian
  */
 public class Usuarios {
@@ -82,8 +81,8 @@ public class Usuarios {
                     + ",clave)"
                     + "     VALUES"
                     + "('" + nombre + "'"
-                    + ",'" + edad + "'"
-                    + "," + url + ""
+                    + "," + edad + ""
+                    + ",'" + url + "'"
                     + ",'" + correo + "'"
                     + ",'" + clave + "')";
 
@@ -111,7 +110,8 @@ public class Usuarios {
             while (rs.next()) {
                 co = rs.getString("correo");
             }
-            if (co != "" || co != null) {
+            System.out.println("**"+co+"**");
+            if (co != "" && co != null) {
                 ok = true;
             }
 
@@ -175,8 +175,8 @@ public class Usuarios {
 
         try {
             JSONParser p = new JSONParser();
-            JSONObject o = (JSONObject) p.parse(gustos);
-            JSONArray a = (JSONArray) o.get("gustos");
+            JSONArray a = (JSONArray) p.parse(gustos);
+//            JSONArray a = (JSONArray) o.get("gustos");
             for (int i = 0; i < a.size(); i++) {
                 System.out.println(a.get(i));
                 Connection conn = c.getConexion();

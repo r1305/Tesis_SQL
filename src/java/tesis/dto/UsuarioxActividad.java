@@ -53,6 +53,75 @@ public class UsuarioxActividad {
         this.puntuacion = puntuacion;
     }
 
+    public boolean registrarEstadistica(String user, int idAct, String rpta) {
+        boolean ok = false;
+        Conexion c = new Conexion();
+        try {
+            Connection con = c.getConexion();
+            String strsql = "insert into estadisticas (idAct,usuario,respuesta) values(?,?,?)";
+            PreparedStatement pstm = con.prepareStatement(strsql);
+            pstm.setInt(1, idAct);
+            pstm.setString(2, user);
+            pstm.setString(3, rpta);
+            pstm.executeUpdate();
+            ok = true;
+            con.close();
+            pstm.close();
+        } catch (Exception e) {
+            ok = false;
+            System.out.println(e);
+        }
+        return ok;
+    }
+    
+    public boolean registrarAsistencia(String user,int idAct){
+        boolean ok=false;
+        Conexion c = new Conexion();
+        try {
+            Connection con = c.getConexion();
+            String strsql = "insert into asistencia (idAct,usuario) values(?,?)";
+            PreparedStatement pstm = con.prepareStatement(strsql);
+            pstm.setInt(1, idAct);
+            pstm.setString(2, user);
+            pstm.executeUpdate();
+            ok = true;
+            con.close();
+            pstm.close();
+        } catch (Exception e) {
+            ok = false;
+            System.out.println(e);
+        }
+        return ok;
+    }
+    
+    public boolean validarAsistencia(String user,int idAct){
+        boolean ok=false;
+        Conexion c = new Conexion();
+        int cont=0;
+        try {
+            Connection con = c.getConexion();
+            String strsql = "select count(*) from asistencia where idAct="+idAct+" and usuario='"+user+"'";
+            PreparedStatement pstm = con.prepareStatement(strsql);
+            ResultSet rs=pstm.executeQuery();
+            while(rs.next()){
+                cont=rs.getInt(1);
+            }
+            if(cont==0){
+                registrarAsistencia(user, idAct);
+                ok=true;
+            }else{
+                ok=false;
+            }
+            con.close();
+            rs.close();
+            pstm.close();
+        } catch (Exception e) {
+            ok = false;
+            System.out.println(e);
+        }
+        return ok;
+    }
+
     public String getNombreApellido(String correo) {
         String nombreA = "";
 
@@ -60,7 +129,7 @@ public class UsuarioxActividad {
         JSONObject o = new JSONObject();
         try {
             Connection con = c.getConexion();
-            String strsql = "SELECT * FROM usuarios";
+            String strsql = "SELECT * FROM usuarios where correo='" + correo + "'";
             PreparedStatement pstm = con.prepareStatement(strsql);
 
             ResultSet rs = pstm.executeQuery();
@@ -99,9 +168,8 @@ public class UsuarioxActividad {
                 usuAct.setIdActividad(rs.getInt("idAct"));
                 usuAct.setIdUsuario(rs.getInt("idUsuario"));
                 usuAct.setPuntuacion(rs.getDouble("puntuacion"));
-                
-//                System.out.println("obtenerPunt: "+usuAct.getIdActividad()+" - "+usuAct.getIdUsuario()+" - "+usuAct.getPuntuacion());
 
+//                System.out.println("obtenerPunt: "+usuAct.getIdActividad()+" - "+usuAct.getIdUsuario()+" - "+usuAct.getPuntuacion());
                 uxr.add(usuAct);
             }
             pstm.close();
@@ -116,10 +184,10 @@ public class UsuarioxActividad {
 
     public boolean insertar(String correo, int idAct, float puntuacion) {
         Conexion c = new Conexion();
-        boolean ok=false;
+        boolean ok = false;
         try {
             Connection con = c.getConexion();
-            String strsql = "insert into usuarioxactividad (puntuacion,vez,idUsuario,idAct) value(?,?,?,?)";
+            String strsql = "insert into usuarioxactividad (puntuacion,vez,idUsuario,idAct) values(?,?,?,?)";
             PreparedStatement pstm = con.prepareStatement(strsql);
             int idUsuario = 0;
             idUsuario = getId(correo);
@@ -129,15 +197,15 @@ public class UsuarioxActividad {
                 pstm.setInt(3, idUsuario);
                 pstm.setInt(4, idAct);
                 pstm.executeUpdate();
-                ok=true;
+                ok = true;
             } else {
-                ok=this.actualizarPuntuacion(idUsuario, idAct, puntuacion);               
+                ok = this.actualizarPuntuacion(idUsuario, idAct, puntuacion);
             }
-            
+
             con.close();
             pstm.close();
         } catch (Exception e) {
-            ok=false;
+            ok = false;
             System.out.println(e);
         }
         return ok;
@@ -148,7 +216,7 @@ public class UsuarioxActividad {
         int cont = 0;
         try {
             Connection con = c.getConexion();
-            String strsql = "SELECT * FROM usuarioxactividad where idUsuario="+idUsuario+" and idAct="+idAct;
+            String strsql = "SELECT * FROM usuarioxactividad where idUsuario=" + idUsuario + " and idAct=" + idAct;
             PreparedStatement pstm = con.prepareStatement(strsql);
 
             ResultSet rs = pstm.executeQuery();
@@ -171,7 +239,7 @@ public class UsuarioxActividad {
 
     public boolean actualizarPuntuacion(int idUsuario, int idAct, float puntuacion) {
         Conexion c = new Conexion();
-        boolean ok=false;
+        boolean ok = false;
         double puntAnt = 0;
         int vez = 0;
         int uxa = 0;
@@ -195,20 +263,20 @@ public class UsuarioxActividad {
                 String query = "update usuarioxactividad set puntuacion=" + nuevaPunt + ", vez=" + vez + " where id=" + uxa;
                 PreparedStatement ps = con.prepareStatement(query);
                 ps.executeUpdate();
-                
+
                 ps.close();
 
                 /*Query para actualizar puntaje de actividades*/
                 String query1 = "update actividades set puntuacion=" + nuevaPunt + " where id=" + idAct;
                 PreparedStatement ps1 = con.prepareStatement(query1);
                 ps1.executeUpdate();
-                ok=true;
+                ok = true;
                 ps1.close();
                 con.close();
             }
 
         } catch (Exception e) {
-            ok=false;
+            ok = false;
             System.out.println(e);
         }
         return ok;

@@ -11,13 +11,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import tesis.dao.Usuarios;
+import tesis.dto.UsuarioxActividad;
 
 /**
  *
  * @author Julian
  */
-public class Gustos extends HttpServlet {
+public class Asistencia extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -30,18 +30,14 @@ public class Gustos extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String gustos=request.getParameter("gustos");
-        String correo=request.getParameter("correo");
-        
-        Usuarios u=new Usuarios();
-        u.gustos(gustos, correo);
-        
-        
+        String user=request.getParameter("user");
+        int idAct=Integer.parseInt(request.getParameter("idAct"));
+        UsuarioxActividad uxa=new UsuarioxActividad();
+        boolean ok=uxa.validarAsistencia(user, idAct);
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.print("ok");
+            out.println(ok);
             
         }
     }

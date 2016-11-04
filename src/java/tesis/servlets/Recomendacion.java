@@ -32,7 +32,7 @@ public class Recomendacion extends HttpServlet {
         int idUsuario=u.getId(correo);
         
         Prediccion p=new Prediccion();
-        String l=p.getActividadRecomendada(idUsuario);
+        String l=p.getActividadRecomendada(idUsuario,correo);
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();

@@ -48,6 +48,14 @@
         <servlet-name>Gustos</servlet-name>
         <servlet-class>tesis.servlets.Gustos</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Estad</servlet-name>
+        <servlet-class>tesis.servlets.Estad</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Asistencia</servlet-name>
+        <servlet-class>tesis.servlets.Asistencia</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Usuario</servlet-name>
         <url-pattern>/Usuario</url-pattern>
@@ -95,6 +103,14 @@
     <servlet-mapping>
         <servlet-name>Gustos</servlet-name>
         <url-pattern>/gustos</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Estad</servlet-name>
+        <url-pattern>/estad</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Asistencia</servlet-name>
+        <url-pattern>/Asistencia</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

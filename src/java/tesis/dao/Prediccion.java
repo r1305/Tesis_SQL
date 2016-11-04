@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Objects;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import tesis.dto.Actividad;
+import org.json.simple.parser.JSONParser;
 import tesis.dto.PuntuacionxActividad;
 import tesis.dto.UsuarioxActividad;
-
 /**
  *
  * @author Julian
@@ -26,35 +25,43 @@ public class Prediccion {
     UsuarioxActividad uxa = new UsuarioxActividad();
     Correlacion c = new Correlacion();
 
-    public String getActividadRecomendada(int idUsuario) {
+    public String getActividadRecomendada(int idUsuario, String correo) {
         String rpta = "";
         //obtener puntuacion promedio del usuario a para la actividad x
         List<PuntuacionxActividad> puntuacion = hallarPrediccion(idUsuario);
         List<Integer> co = puntuados(idUsuario);
-        System.out.println("mis coincidencias");
+        System.out.println("mis actividades");
         for (int u : co) {
             System.out.println(u);
         }
         try {
             for (int j = 0; j < co.size(); j++) {
                 for (int i = 0; i < puntuacion.size(); i++) {
-                    while (Objects.equals(co.get(j), puntuacion.get(i).getAct()) && i < puntuacion.size()) {
-//                        System.out.println(co.get(j) + " - " + puntuacion.get(i).getAct());
-                        if (Objects.equals(co.get(j), puntuacion.get(i).getAct())) {
-                            puntuacion.remove(i);
-                        }
+                    if (Objects.equals(co.get(j), puntuacion.get(i).getAct())) {
+                        puntuacion.remove(i);
                     }
                 }
             }
             rpta = listarPred(puntuacion);
-            System.out.println("rpta: "+rpta);
+            JSONParser p = new JSONParser();
+            JSONObject o = (JSONObject) p.parse(rpta);
+            JSONArray a = (JSONArray) o.get("reco");
+            //System.out.println(a.size());
+            if (a.size() == 0) {
+                rpta = listarxGustos(correo);
+            }
+
         } catch (Exception e) {
-            rpta = listar5Primeros();//cambiar por listar por gustos
+            System.out.println("catch: " + e);
+            rpta = listarxGustos(correo);//cambiar por listar por gustos
+            //System.out.println(rpta);
         }
         System.out.println("recomendaciones");
         for (PuntuacionxActividad puntuacion1 : puntuacion) {
             System.out.println(puntuacion1.getAct());
         }
+
+        System.out.println("rpta: " + rpta);
 
         return rpta;
 
@@ -100,7 +107,7 @@ public class Prediccion {
         return ob.toString();
     }
 
-    public String listar5Primeros() {
+    public String listarxGustos(String correo) {
         Connection cn;
         Conexion con = new Conexion();
         ResultSet rs;
@@ -112,7 +119,7 @@ public class Prediccion {
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "";
 
-            sql = "SELECT * FROM actividades order by puntuacion desc limit 5";
+            sql = "SELECT * FROM actividades where categoria in(select categoria from usuarioxcategoria where idUsuario='" + correo + "');";
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
 
@@ -282,7 +289,7 @@ public class Prediccion {
         float promA = this.promedio(uxr);
         //DesvEst del usuario a evaluar
         float desvEst = this.desvEst(uxr);
-        //Lista de puntuaciones de un restaurante por usuario
+        //Lista de puntuaciones de un actividad por usuario
 
         List<PuntuacionxActividad> pred = new ArrayList<>();
         List<UsuarioxActividad> idActs = idCoincidentes(idUsuario);
