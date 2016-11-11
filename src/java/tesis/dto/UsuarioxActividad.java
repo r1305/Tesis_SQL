@@ -52,6 +52,34 @@ public class UsuarioxActividad {
     public void setPuntuacion(double puntuacion) {
         this.puntuacion = puntuacion;
     }
+    
+    public boolean validarCodigo(int cod) {
+        boolean ok = false;
+        Conexion c = new Conexion();
+        int cont = 0;
+        try {
+            Connection con = c.getConexion();
+            String strsql = "select count(*) from codigos where codigo=" + cod;
+            PreparedStatement pstm = con.prepareStatement(strsql);
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                cont = rs.getInt(1);
+            }
+            if (cont == 1) {
+                ok = true;
+            } else {
+                ok = false;
+            }
+
+            con.close();
+            rs.close();
+            pstm.close();
+        } catch (Exception e) {
+            ok = false;
+            System.out.println(e);
+        }
+        return ok;
+    }
 
     public boolean registrarEstadistica(String user, int idAct, String rpta) {
         boolean ok = false;
