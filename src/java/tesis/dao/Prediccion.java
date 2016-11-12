@@ -16,6 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import tesis.dto.PuntuacionxActividad;
 import tesis.dto.UsuarioxActividad;
+
 /**
  *
  * @author Julian
@@ -24,6 +25,8 @@ public class Prediccion {
 
     UsuarioxActividad uxa = new UsuarioxActividad();
     Correlacion c = new Correlacion();
+    float prom = 0.0f;
+    float desvEst = 0.0f;
 
     public String getActividadRecomendada(int idUsuario, String correo) {
         String rpta = "";
@@ -35,12 +38,14 @@ public class Prediccion {
             System.out.println(u);
         }
         try {
-            for (int j = 0; j < co.size(); j++) {
+            int j = 0;
+            while (j < co.size()) {
                 for (int i = 0; i < puntuacion.size(); i++) {
                     if (Objects.equals(co.get(j), puntuacion.get(i).getAct())) {
                         puntuacion.remove(i);
                     }
                 }
+                j++;
             }
             rpta = listarPred(puntuacion);
             JSONParser p = new JSONParser();
@@ -284,11 +289,11 @@ public class Prediccion {
         List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
         List<UsuarioxActividad> uxr2 = c.traerTodos();
         //List<UsuarioxActividad> uxr2 = todos();
-
+        promedio(idUsuario);
         //Promedio del usuario a evaluar
-        float promA = this.promedio(uxr);
+//        float promA = this.promedio(uxr);
         //DesvEst del usuario a evaluar
-        float desvEst = this.desvEst(uxr);
+//        float desvEst = this.desvEst(uxr);
         //Lista de puntuaciones de un actividad por usuario
 
         List<PuntuacionxActividad> pred = new ArrayList<>();
@@ -299,7 +304,7 @@ public class Prediccion {
             //System.out.println("numerador: "+hallarNumerador(idUsuario, uxr, idActs.get(i)));
             //System.out.println("denomminador: "+hallarDenominador(idUsuario, uxr));
 
-            prediccion = promA + desvEst * this.hallarNumerador(idUsuario, uxr2, idActs.get(i).getIdActividad())
+            prediccion = prom + desvEst * this.hallarNumerador(idUsuario, uxr2, idActs.get(i).getIdActividad())
                     / this.hallarDenominador(idUsuario, uxr2);
             pxl.setAct(idActs.get(i).getIdActividad());
             pxl.setPunt(prediccion);
@@ -317,9 +322,8 @@ public class Prediccion {
         List<UsuarioxActividad> uxa1 = idCoincidentes(idUsuario);
         for (int i = 0; i < uxa1.size(); i++) {
 
-            s = ((puntuacionCruzada(idUsuario, idAct) - promedio(uxa.obtenerPuntuacionesPorUsuario(uxa1.get(i).getIdUsuario())))
-                    / this.desvEst(uxa.obtenerPuntuacionesPorUsuario(uxa1.get(i).getIdUsuario())))
-                    * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
+            s = ((puntuacionCruzada(idUsuario, idAct) - prom)
+                    /desvEst* c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
             if (String.valueOf(s).equals("NaN")) {
                 s = 0;
             }
@@ -376,35 +380,62 @@ public class Prediccion {
         return den;
     }
 
-    private float promedio(List<UsuarioxActividad> punts) {
-        float prom = 0.0f;
+    public void promedio(int idUsuario) {
         float sum = 0.0f;
         int cont = 0;
-        for (int i = 0; i < punts.size(); i++) {
-            sum += punts.get(i).getPuntuacion();
-            cont++;
+        float acum = 0.0f;
+        Conexion con = new Conexion();
+        Connection cn;
+        ResultSet rs;
+        PreparedStatement pr;
+        try {
+            cn = con.getConexion();
+            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
+            String sql = "SELECT puntuacion FROM usuarioxactividad where idUsuario=" + idUsuario;
+
+            pr = cn.prepareStatement(sql);
+            /*Calcular el promedio*/
+            rs = pr.executeQuery();
+            while (rs.next()) {
+                sum += rs.getFloat(1);
+                cont++;
+            }
+            prom = sum / cont;
+            System.out.println("prom: " + prom);
+
+            /*calcular la desvEst*/
+            rs = pr.executeQuery();
+            while (rs.next()) {
+//                System.out.println(rs.getFloat(1));
+                acum += (rs.getFloat(1) - prom) * (rs.getFloat(1) - prom);
+            }
+            desvEst = (float) Math.pow(acum / (cont), 0.5);
+//            System.out.println("desvEst: " + desvEst);
+            rs.close();
+            pr.close();
+            cn.close();
+        } catch (Exception ex) {
+            System.out.println(ex);
         }
-        prom = sum / cont;
-        return prom;
     }
 
-    public float desvEst(List<UsuarioxActividad> punts) {
-        float desvEst = 0.0f;
-        float acum = 0.0f;
-        int cont = 0;
-        for (int i = 0; i < punts.size(); i++) {
+//    public float desvEst(List<UsuarioxActividad> punts) {
+//        float desvEst = 0.0f;
+//        float acum = 0.0f;
+//        int cont = 0;
+//        for (int i = 0; i < punts.size(); i++) {
 //            System.out.println(punts.get(i).getPuntuacion()+ " - " +promedio(punts));
 //            System.out.println("resta: "+ (punts.get(i).getPuntuacion() - promedio(punts)));
-            acum += (punts.get(i).getPuntuacion() - promedio(punts))
-                    * (punts.get(i).getPuntuacion() - promedio(punts));
+//            acum += (punts.get(i).getPuntuacion() - promedio(punts))
+//                    * (punts.get(i).getPuntuacion() - promedio(punts));
 //            System.out.println("acum: "+acum );
-            cont++;
+//            cont++;
 //            System.out.println("cont++: "+cont);
-        }
-        //cont-1 pasa a ser cont y se inicializa en 1, antes en 0
-        desvEst = (float) Math.pow(acum / (cont), 0.5);
-
-        return desvEst;
-    }
+//        }
+//        cont-1 pasa a ser cont y se inicializa en 1, antes en 0
+//        desvEst = (float) Math.pow(acum / (cont), 0.5);
+//
+//        return desvEst;
+//    }
 
 }
