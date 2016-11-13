@@ -98,9 +98,7 @@ public class Prediccion {
                     o.put("capacidad", rs.getInt("capacidad"));
                     o.put("puntaje", rs.getFloat("puntuacion"));
                     ja.add(o);
-
                 }
-
                 rs.close();
                 pr.close();
                 cn.close();
@@ -154,12 +152,21 @@ public class Prediccion {
         Connection cn;
         ResultSet rs;
         PreparedStatement pr;
+        int cont = 0;
         try {
             cn = con.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
-            String sql = "SELECT uxa.idUsuario,uxa.idAct,uxa.puntuacion FROM tesis.usuarios u "
-                    + "join usuarioxactividad uxa "
-                    + "on u.id=uxa.idUsuario where idUsuario not in (" + idUsuario + ")";
+//            String sql = "SELECT uxa.idUsuario,uxa.idAct,uxa.puntuacion FROM tesis.usuarios u "
+//                    + "join usuarioxactividad uxa "
+//                    + "on u.id=uxa.idUsuario where idUsuario not in (" + idUsuario + ")";
+            String sql = "SELECT b.puntuacion, b.idAct,b.idUsuario,a.idUsuario "
+                    + "FROM usuarioxactividad b "
+                    + "join usuarioxactividad a "
+                    + "on (b.idUsuario=" + idUsuario + ") "
+                    + "where (a.idAct=b.idAct) "
+                    + "and "
+                    + "(a.idUsuario<>b.idUsuario) "
+                    + "group by idAct;";
 
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
@@ -168,6 +175,8 @@ public class Prediccion {
                 if (idUsuario != rs.getInt(1)) {
 //                    System.out.println("idUsuario: "+idUsuario);
 //                    System.out.println("idOtro: "+rs.getInt(1));
+                    System.out.println("idUsuario: " + idUsuario + " - " + rs.getInt(1));
+                    cont++;
                     double cor = c.correlacion(idUsuario, rs.getInt(1));
 //                    System.out.println("cor: " + cor);
 //                    System.out.println("corre: "+cor);
@@ -188,10 +197,10 @@ public class Prediccion {
                             uxa.setPuntuacion(rs.getFloat(3));
                             l.add(uxa);
                         }
-
                     }
                 }
             }
+            System.out.println("cont: " + cont);
             rs.close();
             pr.close();
             cn.close();
@@ -211,10 +220,8 @@ public class Prediccion {
             cn = c.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT * FROM usuarioxactividad where idUsuario=" + idUsuario;
-
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
-
             while (rs.next()) {
                 l.add(rs.getInt("idAct"));
             }
@@ -237,10 +244,8 @@ public class Prediccion {
             cn = c.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT * FROM usuarioxactividad";
-
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
-
             while (rs.next()) {
                 UsuarioxActividad uxa = new UsuarioxActividad();
                 uxa.setIdUsuario(rs.getInt("idUsuario"));
@@ -266,10 +271,8 @@ public class Prediccion {
             cn = c.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT * FROM actividades";
-
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
-
             while (rs.next()) {
                 l.add(rs.getInt("id"));
             }
@@ -288,29 +291,18 @@ public class Prediccion {
         //Usuario para evaluar
         List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
         List<UsuarioxActividad> uxr2 = c.traerTodos();
-        //List<UsuarioxActividad> uxr2 = todos();
         promedio(idUsuario);
-        //Promedio del usuario a evaluar
-//        float promA = this.promedio(uxr);
-        //DesvEst del usuario a evaluar
-//        float desvEst = this.desvEst(uxr);
-        //Lista de puntuaciones de un actividad por usuario
-
         List<PuntuacionxActividad> pred = new ArrayList<>();
         List<UsuarioxActividad> idActs = idCoincidentes(idUsuario);
 
         for (int i = 0; i < idActs.size(); i++) {
             PuntuacionxActividad pxl = new PuntuacionxActividad();
-            //System.out.println("numerador: "+hallarNumerador(idUsuario, uxr, idActs.get(i)));
-            //System.out.println("denomminador: "+hallarDenominador(idUsuario, uxr));
-
             prediccion = prom + desvEst * this.hallarNumerador(idUsuario, uxr2, idActs.get(i).getIdActividad())
                     / this.hallarDenominador(idUsuario, uxr2);
             pxl.setAct(idActs.get(i).getIdActividad());
             pxl.setPunt(prediccion);
             pred.add(pxl);
         }
-
         return pred;
     }
 
@@ -321,9 +313,8 @@ public class Prediccion {
         UsuarioxActividad uxa = new UsuarioxActividad();
         List<UsuarioxActividad> uxa1 = idCoincidentes(idUsuario);
         for (int i = 0; i < uxa1.size(); i++) {
-
             s = ((puntuacionCruzada(idUsuario, idAct) - prom)
-                    /desvEst* c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
+                    / desvEst * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
             if (String.valueOf(s).equals("NaN")) {
                 s = 0;
             }
@@ -340,12 +331,9 @@ public class Prediccion {
         PreparedStatement pr;
         try {
             cn = con.getConexion();
-            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT puntuacion FROM usuarioxactividad where idUsuario=" + idUsuario + " and idAct=" + idAct;
-
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
-
             while (rs.next()) {
                 try {
                     punt = rs.getFloat(1);
@@ -375,7 +363,6 @@ public class Prediccion {
             } catch (Exception e) {
                 den += 0;
             }
-
         }
         return den;
     }
@@ -390,9 +377,7 @@ public class Prediccion {
         PreparedStatement pr;
         try {
             cn = con.getConexion();
-            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT puntuacion FROM usuarioxactividad where idUsuario=" + idUsuario;
-
             pr = cn.prepareStatement(sql);
             /*Calcular el promedio*/
             rs = pr.executeQuery();
@@ -406,11 +391,9 @@ public class Prediccion {
             /*calcular la desvEst*/
             rs = pr.executeQuery();
             while (rs.next()) {
-//                System.out.println(rs.getFloat(1));
                 acum += (rs.getFloat(1) - prom) * (rs.getFloat(1) - prom);
             }
             desvEst = (float) Math.pow(acum / (cont), 0.5);
-//            System.out.println("desvEst: " + desvEst);
             rs.close();
             pr.close();
             cn.close();
@@ -418,24 +401,4 @@ public class Prediccion {
             System.out.println(ex);
         }
     }
-
-//    public float desvEst(List<UsuarioxActividad> punts) {
-//        float desvEst = 0.0f;
-//        float acum = 0.0f;
-//        int cont = 0;
-//        for (int i = 0; i < punts.size(); i++) {
-//            System.out.println(punts.get(i).getPuntuacion()+ " - " +promedio(punts));
-//            System.out.println("resta: "+ (punts.get(i).getPuntuacion() - promedio(punts)));
-//            acum += (punts.get(i).getPuntuacion() - promedio(punts))
-//                    * (punts.get(i).getPuntuacion() - promedio(punts));
-//            System.out.println("acum: "+acum );
-//            cont++;
-//            System.out.println("cont++: "+cont);
-//        }
-//        cont-1 pasa a ser cont y se inicializa en 1, antes en 0
-//        desvEst = (float) Math.pow(acum / (cont), 0.5);
-//
-//        return desvEst;
-//    }
-
 }

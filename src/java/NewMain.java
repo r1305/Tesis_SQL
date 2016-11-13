@@ -38,7 +38,7 @@ public class NewMain {
 //        
 //        System.out.println("4,5"+c.correlacion(4, 5));
         Prediccion p=new Prediccion();
-        p.getActividadRecomendada(72,"usuario@gmail.com");
+        p.getActividadRecomendada(62,"rogger.aburto@gmail.com");
 //        p.idCoincidentes(2);
         /*UsuarioxActividad uxa=new UsuarioxActividad();
          System.out.println(uxa.getNombreApellido("rogger.aburto@gmail.com"));*/
