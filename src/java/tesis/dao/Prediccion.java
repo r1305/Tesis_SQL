@@ -55,7 +55,6 @@ public class Prediccion {
             if (a.size() == 0) {
                 rpta = listarxGustos(correo);
             }
-
         } catch (Exception e) {
             System.out.println("catch: " + e);
             rpta = listarxGustos(correo);//cambiar por listar por gustos
@@ -65,9 +64,7 @@ public class Prediccion {
         for (PuntuacionxActividad puntuacion1 : puntuacion) {
             System.out.println(puntuacion1.getAct());
         }
-
         System.out.println("rpta: " + rpta);
-
         return rpta;
 
     }

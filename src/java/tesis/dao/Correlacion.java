@@ -33,17 +33,10 @@ public class Correlacion {
         List<Integer> co = this.coincidencia(uxa1, uxa2);
         promU1=promedio(id1);
         promU2=promedio(id2);
-//        promU1 = promedioLista(uxa1);
-//        promU2 = promedioLista(uxa2);
-//        float prom1 = this.promedioLista(uxa1);
-//        float prom2 = this.promedioLista(uxa2);
 
         float numerador = this.hallarNumerador(promU1, promU2, uxa1, uxa2, co);
-
         float denominador = this.hallarDenominador(promU1, promU2, co, uxa1, uxa2);
-
         correlacion = numerador / denominador;
-
         return correlacion;
     }
 
@@ -66,11 +59,9 @@ public class Correlacion {
             }
             rs.close();
             con.close();
-
         } catch (Exception e) {
             System.out.println(e);
         }
-
         return l;
     }
 
@@ -78,12 +69,9 @@ public class Correlacion {
             float prom1, float prom2,
             List<Integer> co, List<UsuarioxActividad> lista1,
             List<UsuarioxActividad> lista2) {
-        //Math.pow(0, 0);
         float deno = 0.0f;
-
         deno = (float) Math.pow(this.sumCuadrado(prom1, co, lista1, lista2)
                 * this.sumCuadrado(prom2, co, lista1, lista2), 0.5);
-//        System.out.println("deno: "+deno);
         return deno;
     }
 
@@ -100,15 +88,11 @@ public class Correlacion {
             if (n1 == 0) {
                 n1 = 1;
             }
-//            System.out.println("n1: "+n1);
             if (n2 == 0) {
                 n2 = 1;
             }
-//            System.out.println("n2: "+n2);
             sum += n1 * n2;
-//            System.out.println("sumCuad: "+sum);
         }
-
         return sum;
     }
 
@@ -126,40 +110,18 @@ public class Correlacion {
             if (n1 == 0) {
                 n1 = 1;
             }
-//            System.out.println("n1_num: "+n1);
             if (n2 == 0) {
                 n2 = 1;
             }
-//            System.out.println("n2_num: "+n2);
             num += (n1) * (n2);
-//            System.out.println("num: "+num);
-        }
 
+        }
         return num;
     }
-
-    public float promedioLista(List<UsuarioxActividad> lista) {
-        float suma = 0.0f;
-        int cont = 0;
-        float prom;
-
-        for (int i = 0; i < lista.size(); i++) {
-            suma += lista.get(i).getPuntuacion();
-            cont++;
-        }
-
-        prom = suma / cont;
-        if (String.valueOf(prom).equals("NaN")) {
-            prom = 0;
-        }
-//        System.out.println("promedio: "+prom);
-        return prom;
-    }
-    
+   
     public float promedio(int idUsuario) {
         float sum = 0.0f;
         int cont = 0;
-        float acum = 0.0f;
         float prom=0.0f;
         Conexion con = new Conexion();
         Connection cn;
@@ -176,8 +138,6 @@ public class Correlacion {
                 cont++;
             }
             prom = sum / cont;
-            //System.out.println("prom: " + prom);
-
             rs.close();
             pr.close();
             cn.close();
@@ -200,7 +160,6 @@ public class Correlacion {
         return co;
     }
 
-    //este metodo no se usa
     public boolean buscar(int idAct, List<UsuarioxActividad> lista2) {
         boolean enc = false;
         int i = 0;
@@ -217,7 +176,6 @@ public class Correlacion {
         double punt = 0.0f;
         for (int i = 0; i < lista.size(); i++) {
             if (idAct == lista.get(i).getIdActividad()) {
-//                System.out.println("idAct: " + idAct + " - " + lista.get(i).getIdActividad());
                 punt = (float) lista.get(i).getPuntuacion();
             }
         }
@@ -225,11 +183,8 @@ public class Correlacion {
     }
 
     public UsuarioxActividad idUsuarios(int id1, int id2) {
-//        UsuarioxActividad uxa = new UsuarioxActividad();
         UsuarioxActividad uxa3 = null;
 
-//        List<UsuarioxActividad> uxa1 = uxa.obtenerPuntuacionesPorUsuario(id1);
-//        List<UsuarioxActividad> uxa2 = uxa.obtenerPuntuacionesPorUsuario(id2);
         List<Integer> co = coincidencia(uxa1, uxa2);
         Conexion c = new Conexion();
         for (int coin : co) {
@@ -237,7 +192,6 @@ public class Correlacion {
                 Connection con = c.getConexion();
                 String strsql = "SELECT * FROM usuarioxactividad where idAct=" + coin;
                 PreparedStatement pstm = con.prepareStatement(strsql);
-
                 ResultSet rs = pstm.executeQuery();
                 while (rs.next()) {
                     uxa3 = new UsuarioxActividad();
@@ -247,7 +201,6 @@ public class Correlacion {
                 }
                 rs.close();
                 con.close();
-
             } catch (Exception e) {
                 System.out.println(e);
             }
