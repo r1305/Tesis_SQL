@@ -152,55 +152,27 @@ public class Prediccion {
         Connection cn;
         ResultSet rs;
         PreparedStatement pr;
-        int cont = 0;
         try {
             cn = con.getConexion();
-            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
-//            String sql = "SELECT uxa.idUsuario,uxa.idAct,uxa.puntuacion FROM tesis.usuarios u "
-//                    + "join usuarioxactividad uxa "
-//                    + "on u.id=uxa.idUsuario where idUsuario not in (" + idUsuario + ")";
-            String sql = "SELECT b.puntuacion, b.idAct,b.idUsuario,a.idUsuario "
-                    + "FROM usuarioxactividad b "
-                    + "join usuarioxactividad a "
-                    + "on (b.idUsuario=" + idUsuario + ") "
-                    + "where (a.idAct=b.idAct) "
-                    + "and "
-                    + "(a.idUsuario<>b.idUsuario) "
-                    + "group by idAct;";
+
+            String sql = "SELECT b.puntuacion, a.idAct,a.idUsuario"
+                    + "                    FROM usuarioxactividad b"
+                    + "                    join usuarioxactividad a"
+                    + "                    on (b.idAct=a.idAct)"
+                    + "                    where a.idUsuario not in (" + idUsuario + ")"
+                    + "                    group by idAct;";
 
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
 
             while (rs.next()) {
-                if (idUsuario != rs.getInt(1)) {
-//                    System.out.println("idUsuario: "+idUsuario);
-//                    System.out.println("idOtro: "+rs.getInt(1));
-                    System.out.println("idUsuario: " + idUsuario + " - " + rs.getInt(1));
-                    cont++;
-                    double cor = c.correlacion(idUsuario, rs.getInt(1));
-//                    System.out.println("cor: " + cor);
-//                    System.out.println("corre: "+cor);
-                    boolean enc = false;
-//                    if (cor != 0) {
-                    if (String.valueOf(cor) != "NaN") {
 
-                        for (int i = 0; i < l.size(); i++) {
-                            if (l.get(i).getIdActividad() == rs.getInt(2)) {
-                                enc = true;
-                                break;
-                            }
-                        }
-                        if (!enc) {
-                            UsuarioxActividad uxa = new UsuarioxActividad();
-                            uxa.setIdUsuario(rs.getInt(1));
-                            uxa.setIdActividad(rs.getInt(2));
-                            uxa.setPuntuacion(rs.getFloat(3));
-                            l.add(uxa);
-                        }
-                    }
-                }
+                UsuarioxActividad uxa = new UsuarioxActividad();
+                uxa.setIdUsuario(rs.getInt(1));
+                uxa.setIdActividad(rs.getInt(2));
+                uxa.setPuntuacion(rs.getFloat(3));
+                l.add(uxa);
             }
-            System.out.println("cont: " + cont);
             rs.close();
             pr.close();
             cn.close();
