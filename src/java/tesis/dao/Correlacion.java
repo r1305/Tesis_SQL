@@ -182,7 +182,7 @@ public class Correlacion {
         return punt;
     }
 
-    public UsuarioxActividad idUsuarios(int id1, int id2) {
+    public UsuarioxActividad idUsuarios() {
         UsuarioxActividad uxa3 = null;
 
         List<Integer> co = coincidencia(uxa1, uxa2);
