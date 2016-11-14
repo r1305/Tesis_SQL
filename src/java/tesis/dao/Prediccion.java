@@ -152,23 +152,39 @@ public class Prediccion {
         try {
             cn = con.getConexion();
 
-            String sql = "SELECT b.puntuacion, a.idAct,a.idUsuario"
-                    + "                    FROM usuarioxactividad b"
-                    + "                    join usuarioxactividad a"
-                    + "                    on (b.idAct=a.idAct)"
-                    + "                    where a.idUsuario not in (" + idUsuario + ")"
-                    + "                    group by idAct;";
+//            String sql = "SELECT b.puntuacion, a.idAct,a.idUsuario"
+//                    + "                    FROM usuarioxactividad b"
+//                    + "                    join usuarioxactividad a"
+//                    + "                    on (b.idAct=a.idAct)"
+//                    + "                    where a.idUsuario not in (" + idUsuario + ")"
+//                    + "                    group by idAct;";
+            String sql = "SELECT uxl.idUsuario,uxl.idAct,uxl.puntuacion FROM usuarios u "
+                    + "join usuarioxactividad uxl "
+                    + "on u.id=uxl.idUsuario where uxl.idUsuario not in (" + idUsuario + ")";
 
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
 
             while (rs.next()) {
-
-                UsuarioxActividad uxa = new UsuarioxActividad();
-                uxa.setIdUsuario(rs.getInt(1));
-                uxa.setIdActividad(rs.getInt(2));
-                uxa.setPuntuacion(rs.getFloat(3));
-                l.add(uxa);
+                if (idUsuario != rs.getInt(1)) {
+                    double cor = c.correlacion(idUsuario, rs.getInt(1));
+                    boolean enc = false;
+                    if (String.valueOf(cor) != "NaN") {
+                        for (int i = 0; i < l.size(); i++) {
+                            if (l.get(i).getIdActividad() == rs.getInt(2)) {
+                                enc = true;
+                                break;
+                            }
+                        }
+                        if (!enc) {
+                            UsuarioxActividad uxl = new UsuarioxActividad();
+                            uxl.setIdUsuario(rs.getInt("idUsuario"));
+                            uxl.setIdActividad(rs.getInt("idAct"));
+                            uxl.setPuntuacion(rs.getFloat("puntuacion"));
+                            l.add(uxl);
+                        }
+                    }
+                }
             }
             rs.close();
             pr.close();
@@ -258,7 +274,7 @@ public class Prediccion {
         float prediccion = 0;
 
         //Usuario para evaluar
-//        List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
+        List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
         List<UsuarioxActividad> uxr2 = c.traerTodos();
         promedio(idUsuario);
         List<PuntuacionxActividad> pred = new ArrayList<>();
@@ -266,7 +282,7 @@ public class Prediccion {
 
         for (int i = 0; i < idActs.size(); i++) {
             PuntuacionxActividad pxl = new PuntuacionxActividad();
-            prediccion = prom + desvEst * this.hallarNumerador(idUsuario, idActs.get(i).getIdActividad(), idActs)
+            prediccion = prom + desvEst * this.hallarNumerador(idUsuario, uxr2, idActs.get(i).getIdActividad())
                     / this.hallarDenominador(idUsuario, uxr2);
             pxl.setAct(idActs.get(i).getIdActividad());
             pxl.setPunt(prediccion);
@@ -275,12 +291,15 @@ public class Prediccion {
         return pred;
     }
 
-    private float hallarNumerador(int idUsuario, int idAct, List<UsuarioxActividad> uxa1) {
+    private float hallarNumerador(int idUsuario, List<UsuarioxActividad> uxr, int idAct) {
         float sum = 0.0f;
         double s = 0.0f;
+        //aqui debo llamar a idUsuarios
+        UsuarioxActividad uxa = new UsuarioxActividad();
+        List<UsuarioxActividad> uxa1 = idCoincidentes(idUsuario);
         for (int i = 0; i < uxa1.size(); i++) {
-            s = ((puntuacionCruzada(idUsuario, idAct) - prom) / desvEst)
-                    * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
+            s = ((puntuacionCruzada(idUsuario, idAct) - prom)
+                    / desvEst * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
             if (String.valueOf(s).equals("NaN")) {
                 s = 0;
             }
@@ -318,9 +337,10 @@ public class Prediccion {
 
     private float hallarDenominador(int idUsuario, List<UsuarioxActividad> uxr) {
         float den = 0.0f;
+        UsuarioxActividad uxa = new UsuarioxActividad();
         List<UsuarioxActividad> uxa1 = new ArrayList<>();
         for (int i = 0; i < uxr.size(); i++) {
-            uxa1.add(c.idUsuarios());
+            uxa1.add(c.idUsuarios(idUsuario, uxr.get(i).getIdUsuario()));
         }
         for (int i = 0; i < uxa1.size(); i++) {
             try {

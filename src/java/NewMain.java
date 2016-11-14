@@ -20,12 +20,12 @@ public class NewMain {
     public static void main(String[] args) {
         // TODO code application logic here       
         Prediccion p=new Prediccion();
-        System.out.println("usuario: rogger.aburto@gmail.com");
-        p.getActividadRecomendada(62,"rogger.aburto@gmail.com");
-        System.out.println("");
-        System.out.println("");
+//        System.out.println("usuario: rogger.aburto@gmail.com");
+//        p.getActividadRecomendada(62,"rogger.aburto@gmail.com");
+//        System.out.println("");
+//        System.out.println("");
         System.out.println("usuario: usuario@gmail.com");     
-        p.getActividadRecomendada(72,"usuario@gmail.com");
+        p.getActividadRecomendada(86,"u2@gmail.com");
         
     }
 
