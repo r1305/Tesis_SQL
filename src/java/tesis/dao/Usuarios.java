@@ -137,7 +137,7 @@ public class Usuarios {
                 id = rs.getString("correo");
             }
             if(id=""){
-                id="error";
+                id="fail";
             }
             rs.close();
             pstm.close();
