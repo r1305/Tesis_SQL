@@ -136,6 +136,9 @@ public class Usuarios {
             while (rs.next()) {
                 id = rs.getString("correo");
             }
+            if(id==""){
+                id="error";
+            }
             rs.close();
             pstm.close();
             con.close();

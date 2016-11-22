@@ -29,7 +29,7 @@ public class Conexion {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             try {
-                con = DriverManager.getConnection(url3);
+                con = DriverManager.getConnection(url);
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
