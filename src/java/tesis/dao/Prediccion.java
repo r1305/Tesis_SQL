@@ -28,6 +28,8 @@ public class Prediccion {
     float prom = 0.0f;
     float desvEst = 0.0f;
     double[] cor;
+    Conexion con = new Conexion();
+    Connection cn;
 
     public String getActividadRecomendada(int idUsuario, String correo) {
         String rpta = "";
@@ -75,8 +77,6 @@ public class Prediccion {
         JSONArray ja = new JSONArray();
         JSONObject ob = new JSONObject();
         for (int i = 0; i < l.size(); i++) {
-            Connection cn;
-            Conexion con = new Conexion();
             ResultSet rs;
             PreparedStatement pr;
 
@@ -100,7 +100,6 @@ public class Prediccion {
                 }
                 rs.close();
                 pr.close();
-                cn.close();
             } catch (Exception ex) {
                 System.out.println(ex);
             }
@@ -110,14 +109,11 @@ public class Prediccion {
     }
 
     public String listarxGustos(String correo) {
-        Connection cn;
-        Conexion con = new Conexion();
         ResultSet rs;
         PreparedStatement pr;
         JSONObject ob = new JSONObject();
         JSONArray ja = new JSONArray();
         try {
-            cn = con.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "";
 
@@ -147,19 +143,9 @@ public class Prediccion {
 
     public List<UsuarioxActividad> idCoincidentes(int idUsuario) {
         List<UsuarioxActividad> l = new ArrayList<>();
-        Conexion con = new Conexion();
-        Connection cn;
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = con.getConexion();
-
-//            String sql = "SELECT b.puntuacion, a.idAct,a.idUsuario"
-//                    + "                    FROM usuarioxactividad b"
-//                    + "                    join usuarioxactividad a"
-//                    + "                    on (b.idAct=a.idAct)"
-//                    + "                    where a.idUsuario not in (" + idUsuario + ")"
-//                    + "                    group by idAct;";
             String sql = "SELECT uxl.idUsuario,uxl.idAct,uxl.puntuacion FROM usuarios u "
                     + "join usuarioxactividad uxl "
                     + "on u.id=uxl.idUsuario where uxl.idUsuario not in (" + idUsuario + ")";
@@ -199,13 +185,9 @@ public class Prediccion {
 
     public List<Integer> puntuados(int idUsuario) {
         List<Integer> l = new ArrayList<>();
-        Conexion c = new Conexion();
-        Connection cn;
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = c.getConexion();
-            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT * FROM usuarioxactividad where idUsuario=" + idUsuario;
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
@@ -214,7 +196,6 @@ public class Prediccion {
             }
             rs.close();
             pr.close();
-            cn.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -223,13 +204,9 @@ public class Prediccion {
 
     public List<UsuarioxActividad> todos() {
         List<UsuarioxActividad> l = new ArrayList<>();
-        Conexion c = new Conexion();
-        Connection cn;
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = c.getConexion();
-            //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT * FROM usuarioxactividad";
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
@@ -241,7 +218,6 @@ public class Prediccion {
             }
             rs.close();
             pr.close();
-            cn.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -250,12 +226,9 @@ public class Prediccion {
 
     public List<Integer> todasActividades() {
         List<Integer> l = new ArrayList<>();
-        Conexion c = new Conexion();
-        Connection cn;
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = c.getConexion();
             //String sql = "SELECT * FROM actividades where puntuacion>=" + puntuacion+" and fecha>=current_date()";
             String sql = "SELECT * FROM actividades";
             pr = cn.prepareStatement(sql);
@@ -265,7 +238,6 @@ public class Prediccion {
             }
             rs.close();
             pr.close();
-            cn.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -300,9 +272,9 @@ public class Prediccion {
         UsuarioxActividad uxa = new UsuarioxActividad();
         List<UsuarioxActividad> uxa1 = idCoincidentes(idUsuario);
         for (int i = 0; i < uxa1.size(); i++) {
-            cor=new double[uxa1.size()];
+            cor = new double[uxa1.size()];
             //System.out.println(c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
-            cor[i]=c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
+            cor[i] = c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
             s = ((puntuacionCruzada(idUsuario, idAct) - prom)
                     / desvEst * cor[i]);
             if (String.valueOf(s).equals("NaN")) {
@@ -315,12 +287,9 @@ public class Prediccion {
 
     public float puntuacionCruzada(int idUsuario, int idAct) {
         float punt = 0.0f;
-        Conexion con = new Conexion();
-        Connection cn;
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = con.getConexion();
             String sql = "SELECT puntuacion FROM usuarioxactividad where idUsuario=" + idUsuario + " and idAct=" + idAct;
             pr = cn.prepareStatement(sql);
             rs = pr.executeQuery();
@@ -333,7 +302,6 @@ public class Prediccion {
             }
             rs.close();
             pr.close();
-            cn.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -361,12 +329,10 @@ public class Prediccion {
         float sum = 0.0f;
         int cont = 0;
         float acum = 0.0f;
-        Conexion con = new Conexion();
-        Connection cn;
+
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = con.getConexion();
             String sql = "SELECT puntuacion FROM usuarioxactividad where idUsuario=" + idUsuario;
             pr = cn.prepareStatement(sql);
             /*Calcular el promedio*/
@@ -386,7 +352,6 @@ public class Prediccion {
             desvEst = (float) Math.pow(acum / (cont), 0.5);
             rs.close();
             pr.close();
-            cn.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }

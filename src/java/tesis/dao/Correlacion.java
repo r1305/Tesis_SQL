@@ -88,14 +88,11 @@ public class Correlacion {
         float sum = 0.0f;
         int cont = 0;
         float prom = 0.0f;
-        Conexion con = new Conexion();
-        Connection cn;
         ResultSet rs;
         PreparedStatement pr;
         try {
-            cn = con.getConexion();
             String sql = "SELECT puntuacion FROM usuarioxactividad where idUsuario=" + idUsuario;
-            pr = cn.prepareStatement(sql);
+            pr = con.prepareStatement(sql);
             /*Calcular el promedio*/
             rs = pr.executeQuery();
             while (rs.next()) {
@@ -105,7 +102,7 @@ public class Correlacion {
             prom = sum / cont;
             rs.close();
             pr.close();
-            cn.close();
+            con.close();
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -153,7 +150,6 @@ public class Correlacion {
                inf=centro+1;
             }
         }
-
         return enc;
     }
 
@@ -171,10 +167,8 @@ public class Correlacion {
         UsuarioxActividad uxa3 = null;
 
         List<Integer> co = coincidencia(uxa1, uxa2);
-        Conexion c = new Conexion();
         for (int coin : co) {
             try {
-                Connection con = c.getConexion();
                 String strsql = "SELECT * FROM usuarioxactividad where idAct=" + coin;
                 PreparedStatement pstm = con.prepareStatement(strsql);
                 ResultSet rs = pstm.executeQuery();
@@ -185,7 +179,6 @@ public class Correlacion {
                     uxa3.setIdActividad(rs.getInt("idAct"));
                 }
                 rs.close();
-                con.close();
             } catch (Exception e) {
                 System.out.println(e);
             }
