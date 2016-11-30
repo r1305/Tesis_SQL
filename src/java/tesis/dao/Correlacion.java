@@ -84,53 +84,6 @@ public class Correlacion {
         return l;
     }
 
-//    private float hallarDenominador(List<UsuarioxActividad> lista1,
-//            List<UsuarioxActividad> lista2) {
-//        float deno = 0.0f;
-//        deno = (float) Math.pow(sum * sum, 0.5);
-//        return deno;
-//    }
-//
-//    private float sumCuadrado(
-//            List<UsuarioxActividad> lista,
-//            List<UsuarioxActividad> lista2) {
-//        float sum = 0.0f;
-//        double n1 = 0.0f;
-//        double n2 = 0.0f;
-//        for (int i = 0; i < co.size(); i++) {
-//            n1 = this.buscarPunt(co.get(i), lista) - promU1;
-//            n2 = this.buscarPunt(co.get(i), lista2) - promU2;
-//            if (n1 == 0) {
-//                n1 = 1;
-//            }
-//            if (n2 == 0) {
-//                n2 = 1;
-//            }
-//            sum += n1 * n2;
-//        }
-//        return sum;
-//    }
-//
-//    private float hallarNumerador(List<UsuarioxActividad> lista1,
-//            List<UsuarioxActividad> lista2) {
-//        float num = 0.0f;
-//        double n1 = 0.0f;
-//        double n2 = 0.0f;
-//        for (int i = 0; i < co.size(); i++) {
-//            n1 = this.buscarPunt(co.get(i), lista1) - promU1;
-//            n2 = this.buscarPunt(co.get(i), lista2) - promU2;
-//            if (n1 == 0) {
-//                n1 = 1;
-//            }
-//            if (n2 == 0) {
-//                n2 = 1;
-//            }
-//            num += (n1) * (n2);
-//
-//        }
-//        return num;
-//    }
-
     public float promedio(int idUsuario) {
         float sum = 0.0f;
         int cont = 0;
