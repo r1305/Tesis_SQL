@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * @author Julian
  */
 public class Conexion {
-    String url = "jdbc:mysql://us-cdbr-iron-east-04.cleardb.net:3306/heroku_74736d96aaaaaed?user=bf5984dcefc6a5&password=77b6157c";
+    String url = "jdbc:mysql://zpj83vpaccjer3ah.chr7pe7iynqr.eu-west-1.rds.amazonaws.com/flqnha3jdxua9wbf?user=cu0igi8hjmo1c33j&password=febgtp963c17qe22";
     //url de conexion a la máquina de servidor dedicado
     //usuario: tesis_bd tiene todos los permisos necesarios para acceder desde otro host
     //192.168.118.130: host de la máquina servidor de mysql

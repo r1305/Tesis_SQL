@@ -27,6 +27,7 @@ public class Prediccion {
     Correlacion c = new Correlacion();
     float prom = 0.0f;
     float desvEst = 0.0f;
+    double[] cor;
 
     public String getActividadRecomendada(int idUsuario, String correo) {
         String rpta = "";
@@ -53,6 +54,7 @@ public class Prediccion {
             JSONArray a = (JSONArray) o.get("reco");
             //System.out.println(a.size());
             if (a.size() == 0) {
+                System.out.println("==0");
                 rpta = listarxGustos(correo);
             }
         } catch (Exception e) {
@@ -274,7 +276,7 @@ public class Prediccion {
         float prediccion = 0;
 
         //Usuario para evaluar
-        List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
+        //List<UsuarioxActividad> uxr = uxa.obtenerPuntuacionesPorUsuario(idUsuario);
         List<UsuarioxActividad> uxr2 = c.traerTodos();
         promedio(idUsuario);
         List<PuntuacionxActividad> pred = new ArrayList<>();
@@ -298,8 +300,11 @@ public class Prediccion {
         UsuarioxActividad uxa = new UsuarioxActividad();
         List<UsuarioxActividad> uxa1 = idCoincidentes(idUsuario);
         for (int i = 0; i < uxa1.size(); i++) {
+            cor=new double[uxa1.size()];
+            //System.out.println(c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
+            cor[i]=c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
             s = ((puntuacionCruzada(idUsuario, idAct) - prom)
-                    / desvEst * c.correlacion(idUsuario, uxa1.get(i).getIdUsuario()));
+                    / desvEst * cor[i]);
             if (String.valueOf(s).equals("NaN")) {
                 s = 0;
             }
@@ -344,7 +349,7 @@ public class Prediccion {
         }
         for (int i = 0; i < uxa1.size(); i++) {
             try {
-                den += c.correlacion(idUsuario, uxa1.get(i).getIdUsuario());
+                den += cor[i];
             } catch (Exception e) {
                 den += 0;
             }

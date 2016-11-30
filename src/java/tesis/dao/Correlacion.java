@@ -22,6 +22,10 @@ public class Correlacion {
     float promU2;
     List<UsuarioxActividad> uxa1;
     List<UsuarioxActividad> uxa2;
+    List<Integer> co;
+    float sum;
+    Conexion c = new Conexion();
+    Connection con = c.getConexion();
 
     public double correlacion(int id1, int id2) {
         double correlacion = 0.0;
@@ -30,12 +34,27 @@ public class Correlacion {
 
         uxa2 = uxa.obtenerPuntuacionesPorUsuario(id2);
 
-        List<Integer> co = this.coincidencia(uxa1, uxa2);
-        promU1=promedio(id1);
-        promU2=promedio(id2);
+        co = this.coincidencia(uxa1, uxa2);
+        promU1 = promedio(id1);
+        promU2 = promedio(id2);
+        double n1=0;
+        double n2=0;
+        /*Sumatoria de i=1 hasta m de (ra,i-promA)*(ru,i-promU)*/
+        for (int i = 0; i < co.size(); i++) {
+            n1 = this.buscarPunt(co.get(i), uxa1) - promU1;
+            n2 = this.buscarPunt(co.get(i), uxa2) - promU2;
+            if (n1 == 0) {
+                n1 = 1;
+            }
+            if (n2 == 0) {
+                n2 = 1;
+            }
+            sum += (n1) * (n2);
 
-        float numerador = this.hallarNumerador(promU1, promU2, uxa1, uxa2, co);
-        float denominador = this.hallarDenominador(promU1, promU2, co, uxa1, uxa2);
+        }
+
+        double numerador = sum; //this.hallarNumerador(uxa1, uxa2);
+        double denominador =Math.pow(sum * sum, 0.5);// this.hallarDenominador(uxa1, uxa2);
         correlacion = numerador / denominador;
         return correlacion;
     }
@@ -43,9 +62,9 @@ public class Correlacion {
     public List<UsuarioxActividad> traerTodos() {
         List<UsuarioxActividad> l = new ArrayList<>();
         UsuarioxActividad uxa;
-        Conexion c = new Conexion();
+        
         try {
-            Connection con = c.getConexion();
+            
             String strsql = "SELECT * FROM usuarioxactividad";
             PreparedStatement pstm = con.prepareStatement(strsql);
 
@@ -65,64 +84,57 @@ public class Correlacion {
         return l;
     }
 
-    private float hallarDenominador(
-            float prom1, float prom2,
-            List<Integer> co, List<UsuarioxActividad> lista1,
-            List<UsuarioxActividad> lista2) {
-        float deno = 0.0f;
-        deno = (float) Math.pow(this.sumCuadrado(prom1, co, lista1, lista2)
-                * this.sumCuadrado(prom2, co, lista1, lista2), 0.5);
-        return deno;
-    }
+//    private float hallarDenominador(List<UsuarioxActividad> lista1,
+//            List<UsuarioxActividad> lista2) {
+//        float deno = 0.0f;
+//        deno = (float) Math.pow(sum * sum, 0.5);
+//        return deno;
+//    }
+//
+//    private float sumCuadrado(
+//            List<UsuarioxActividad> lista,
+//            List<UsuarioxActividad> lista2) {
+//        float sum = 0.0f;
+//        double n1 = 0.0f;
+//        double n2 = 0.0f;
+//        for (int i = 0; i < co.size(); i++) {
+//            n1 = this.buscarPunt(co.get(i), lista) - promU1;
+//            n2 = this.buscarPunt(co.get(i), lista2) - promU2;
+//            if (n1 == 0) {
+//                n1 = 1;
+//            }
+//            if (n2 == 0) {
+//                n2 = 1;
+//            }
+//            sum += n1 * n2;
+//        }
+//        return sum;
+//    }
+//
+//    private float hallarNumerador(List<UsuarioxActividad> lista1,
+//            List<UsuarioxActividad> lista2) {
+//        float num = 0.0f;
+//        double n1 = 0.0f;
+//        double n2 = 0.0f;
+//        for (int i = 0; i < co.size(); i++) {
+//            n1 = this.buscarPunt(co.get(i), lista1) - promU1;
+//            n2 = this.buscarPunt(co.get(i), lista2) - promU2;
+//            if (n1 == 0) {
+//                n1 = 1;
+//            }
+//            if (n2 == 0) {
+//                n2 = 1;
+//            }
+//            num += (n1) * (n2);
+//
+//        }
+//        return num;
+//    }
 
-    private float sumCuadrado(
-            float prom, List<Integer> co, 
-            List<UsuarioxActividad> lista, 
-            List<UsuarioxActividad> lista2) {
-        float sum = 0.0f;
-        double n1 = 0.0f;
-        double n2 = 0.0f;
-        for (int i = 0; i < co.size(); i++) {
-            n1 = this.buscarPunt(co.get(i), lista) - prom;
-            n2 = this.buscarPunt(co.get(i), lista2) - prom;
-            if (n1 == 0) {
-                n1 = 1;
-            }
-            if (n2 == 0) {
-                n2 = 1;
-            }
-            sum += n1 * n2;
-        }
-        return sum;
-    }
-
-    private float hallarNumerador(
-            float prom1, float prom2,
-            List<UsuarioxActividad> lista1,
-            List<UsuarioxActividad> lista2, 
-            List<Integer> co) {
-        float num = 0.0f;
-        double n1 = 0.0f;
-        double n2 = 0.0f;
-        for (int i = 0; i < co.size(); i++) {
-            n1 = this.buscarPunt(co.get(i), lista1) - prom1;
-            n2 = this.buscarPunt(co.get(i), lista2) - prom2;
-            if (n1 == 0) {
-                n1 = 1;
-            }
-            if (n2 == 0) {
-                n2 = 1;
-            }
-            num += (n1) * (n2);
-
-        }
-        return num;
-    }
-   
     public float promedio(int idUsuario) {
         float sum = 0.0f;
         int cont = 0;
-        float prom=0.0f;
+        float prom = 0.0f;
         Conexion con = new Conexion();
         Connection cn;
         ResultSet rs;
@@ -153,7 +165,7 @@ public class Correlacion {
         List<Integer> co = new ArrayList<>();
 
         for (int i = 0; i < lista1.size(); i++) {
-            if (this.buscar(lista1.get(i).getIdActividad(), lista2)) {
+            if (this.buscarQuick(lista1.get(i).getIdActividad(), lista2)) {
                 co.add(lista1.get(i).getIdActividad());
             }
         }
@@ -172,6 +184,26 @@ public class Correlacion {
         return enc;
     }
 
+    public boolean buscarQuick(int idAct, List<UsuarioxActividad> lista2) {
+        boolean enc = false;
+        int n = lista2.size();
+        int centro, inf = 0, sup = n - 1;
+        while (inf <= sup) {
+            centro = ((sup + inf) / 2);
+            
+            //System.out.println("idAct: "+lista2.get(centro).getIdActividad());
+            if (lista2.get(centro).getIdActividad() == idAct) {
+                return true;
+            } else if (idAct < lista2.get(centro).getIdActividad()) {
+                sup = centro - 1;
+            } else {
+               inf=centro+1;
+            }
+        }
+
+        return enc;
+    }
+
     public double buscarPunt(int idAct, List<UsuarioxActividad> lista) {
         double punt = 0.0f;
         for (int i = 0; i < lista.size(); i++) {
@@ -181,7 +213,7 @@ public class Correlacion {
         }
         return punt;
     }
-
+    
     public UsuarioxActividad idUsuarios(int id1, int id2) {
         UsuarioxActividad uxa3 = null;
 
